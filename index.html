@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Palace After School</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Feedback invite ── */
+    .feedback-invite {
+      text-align: center;
+      margin-top: 44px;
+      padding-top: 36px;
+      border-top: 1px solid rgba(154,130,115,0.14);
+    }
+    .feedback-invite p {
+      font-size: 1.05rem;
+      color: rgba(95,75,63,0.82);
+      margin-bottom: 16px;
+    }
+
+    /* ── Feedback modal backdrop ── */
+    .feedback-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(30,20,10,0.52);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .feedback-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Modal card ── */
+    .feedback-modal {
+      background: var(--warm-ivory);
+      border: 1px solid rgba(154,130,115,0.18);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 32px 80px rgba(30,20,10,0.28);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      padding: 44px 44px 40px;
+    }
+    .feedback-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: var(--taupe);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .feedback-close:hover {
+      color: var(--text);
+      background: rgba(154,130,115,0.12);
+    }
+
+    /* ── Form heading ── */
+    .feedback-modal-inner h3 {
+      font-size: 1.7rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+    .feedback-modal-inner > p {
+      font-size: 1rem;
+      color: rgba(95,75,63,0.85);
+      margin-bottom: 28px;
+    }
+
+    /* ── Form fields ── */
+    .fb-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .fb-field label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+    .fb-field input,
+    .fb-field textarea {
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(154,130,115,0.22);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+    .fb-field input:focus,
+    .fb-field textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(211,165,47,0.14);
+    }
+
+    /* ── Star rating ── */
+    .fb-stars {
+      display: flex;
+      gap: 4px;
+    }
+    .fb-stars button {
+      background: none;
+      border: none;
+      font-size: 1.9rem;
+      color: rgba(154,130,115,0.28);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .fb-stars button.active {
+      color: var(--gold);
+    }
+    .fb-stars button:hover {
+      transform: scale(1.18);
+    }
+
+    /* ── Success panel ── */
+    .feedback-success {
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+    .fb-success-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(211,165,47,0.16), rgba(30,63,119,0.08));
+      border: 2px solid rgba(211,165,47,0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--gold);
+      margin: 0 auto 22px;
+    }
+    .feedback-success h3 {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .feedback-success p {
+      font-size: 1rem;
+      color: rgba(95,75,63,0.88);
+      margin-bottom: 28px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── Two-column field row ── */
+    .fb-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── Select ── */
+    .fb-field select {
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(154,130,115,0.22);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a8273' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      cursor: pointer;
+    }
+    .fb-field select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(211,165,47,0.14);
+    }
+
+    @media (max-width: 520px) {
+      .fb-row { grid-template-columns: 1fr; }
+      .feedback-modal { padding: 36px 24px 32px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a class="brand" href="#acasa">
+       <div class="brand-badge">
+            <img src="images/logo.PNG" alt="English Palace logo">
+        </div>
+        <div class="brand-text">
+          <strong>English Palace</strong>
+          <span>After School</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul>
+          <li><a href="#acasa">Acasă</a></li>
+          <li><a href="#avantaje">Avantaje</a></li>
+          <li><a href="activitati.html">Activități</a></li>
+          <li><a href="profesori.html">Profesori</a></li>
+          <li><a href="#tarife">Tarife</a></li>
+          <li><a href="#testimoniale">Testimoniale</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <a class="btn btn-primary" id="openInscriere" href="#contact">Înscrie-te acum</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="acasa">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Educație cu grijă</div>
+          <h1>Locul unde copiii învață, se dezvoltă și strălucesc.</h1>
+          <p>
+            La <strong>English Palace After School</strong>, combinăm sprijinul educațional,
+            creativitatea și un mediu elegant, cald și sigur, în care fiecare copil este încurajat
+            să își descopere potențialul și să prindă încredere în propriile forțe.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="activitati.html">Descoperă programul</a>
+            <a class="btn btn-secondary" href="#tarife">Vezi tarifele</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <strong>Primar</strong>
+              <span>Sprijin pentru elevii din ciclul primar</span>
+            </div>
+            <div class="hero-stat">
+              <strong>5 zile</strong>
+              <span>Ateliere creative și activități variate</span>
+            </div>
+            <div class="hero-stat">
+              <strong>Cu grijă</strong>
+              <span>Profesori dedicați și atenție individuală</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-frame"></div>
+          <div class="hero-arch"></div>
+
+          <div class="hero-card-floating">
+            <strong>Un spațiu prietenos</strong>
+            <p>Atmosferă calmă și un cadru în care educația se simte natural.</p>
+          </div>
+
+          <div class="hero-photo-small">
+            <div class="placeholder-photo">
+                 <img src="images/clasa.jpeg" alt="English Palace logo">
+            </div>
+          </div>
+
+          <div class="hero-photo-main">
+            <div class="placeholder-photo">
+                <img src="images/img1.jpeg" alt="English Palace logo">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="avantaje">
+      <div class="container">
+        <div class="section-title">
+          <div class="eyebrow">De ce să ne alegi</div>
+          <h2>Un after school care îmbină eleganța, siguranța și performanța</h2>
+          <p>
+            Am construit un spațiu care reflectă identitatea English Palace: cald, rafinat,
+            prietenos și orientat spre dezvoltarea armonioasă a copilului.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="icon-circle">👩‍🏫</div>
+            <h3>Profesori dedicați</h3>
+            <p>Cadre didactice implicate, răbdătoare și atente la ritmul fiecărui copil.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon-circle">🛡️</div>
+            <h3>Mediu sigur</h3>
+            <p>Un spațiu calm și organizat, unde copiii se simt protejați și apreciați.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon-circle">🌱</div>
+            <h3>Dezvoltare armonioasă</h3>
+            <p>Susținem atât progresul școlar, cât și creativitatea, autonomia și încrederea în sine.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon-circle">🎨</div>
+            <h3>Activități diverse</h3>
+            <p>Program echilibrat între teme, ateliere creative, mișcare și explorare.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon-circle">💙</div>
+            <h3>Atenție personalizată</h3>
+            <p>Lucrăm cu grijă și consecvență pentru rezultate reale și copii mai încrezători.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="activitati">
+      <div class="container">
+        <div class="section-title">
+          <div class="eyebrow">Program săptămânal</div>
+          <h2>Activități care transformă fiecare zi într-o experiență frumoasă</h2>
+          <p>
+            Organizăm activități recreative pentru copiii voștri. Promovăm spiritul de echipă, comunicarea și oprtunitățile de socializare.
+          </p>
+        </div>
+
+        <div class="activities-grid">
+          <article class="activity-card">
+            <div class="icon-circle">🎨</div>
+            <span class="day">Luni</span>
+            <h3>Atelier de pictură</h3>
+            <p>Dezvoltăm creativitatea, răbdarea și exprimarea artistică prin exerciții adaptate vârstei.</p>
+          </article>
+
+          <article class="activity-card">
+            <div class="icon-circle">🎹</div>
+            <span class="day">Marți</span>
+            <h3>Lecții de pian</h3>
+            <p>Copiii descoperă muzica într-un mod plăcut, prin ritm, ascultare și coordonare.</p>
+          </article>
+
+          <article class="activity-card">
+            <div class="icon-circle">💻</div>
+            <span class="day">Miercuri</span>
+            <h3>Informatică pentru începători</h3>
+            <p>Noțiuni informatice de bază, exerciții interactive și primii pași în tehnologie.</p>
+          </article>
+
+          <article class="activity-card">
+            <div class="icon-circle">✨</div>
+            <span class="day">Joi</span>
+            <h3>Workshop de creație</h3>
+            <p>Ateliere practice și proiecte de lucru care stimulează imaginația și motricitatea fină.</p>
+          </article>
+
+          <article class="activity-card">
+            <div class="icon-circle">⚽</div>
+            <span class="day">Vineri</span>
+            <h3>Activități sportive</h3>
+            <p>Mișcare, jocuri de echipă și exerciții recreative pentru energie și bună dispoziție.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tarife">
+      <div class="container">
+        <div class="section-title">
+          <div class="eyebrow">Tarife</div>
+          <h2>Pachete clare, elegante și ușor de înțeles pentru părinți</h2>
+          <p class="fee-highlight">
+            Poți păstra aceste variante ca exemplu de prezentare și le poți ajusta ulterior cu prețurile reale,
+            programul exact și serviciile incluse.
+          </p>
+        </div>
+
+        <div class="fees-grid">
+          <article class="fee-card">
+            <span class="fee-badge">Program scurt</span>
+            <h3>After School Basic</h3>
+            <div class="price">450 RON<small>pe lună</small></div>
+            <p>Ideal pentru familiile care doresc sprijin la teme și supraveghere educațională.</p>
+            <ul class="fee-list">
+              <li>Asistență pentru teme</li>
+              <li>Supraveghere după școală</li>
+              <li>1 activitate săptămânală</li>
+            </ul>
+            <a class="btn btn-secondary" href="#contact">Solicită detalii</a>
+          </article>
+
+          <article class="fee-card featured">
+            <span class="fee-badge">Cel mai ales</span>
+            <h3>After School Complet</h3>
+            <div class="price">750 RON<small>pe lună</small></div>
+            <p>Pachet echilibrat pentru familii care își doresc un program complet, variat și bine structurat.</p>
+            <ul class="fee-list">
+              <li>Sprijin zilnic pentru teme</li>
+              <li>Activități creative și educative</li>
+              <li>Atenție individuală și feedback</li>
+            </ul>
+            <a class="btn btn-primary" href="#contact">Rezervă un loc</a>
+          </article>
+
+          <article class="fee-card">
+            <span class="fee-badge">Ateliere</span>
+            <h3>Ședințe individuale</h3>
+            <div class="price">90 RON<small>pe sesiune</small></div>
+            <p>Potrivite pentru activități punctuale, workshopuri sau cursuri suplimentare.</p>
+            <ul class="fee-list">
+              <li>Pictură și creație</li>
+              <li>Pian și expresie muzicală</li>
+              <li>Informatică pentru începători</li>
+            </ul>
+            <a class="btn btn-secondary" href="#contact">Cere ofertă</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="testimoniale">
+      <div class="container">
+        <div class="section-title">
+          <div class="eyebrow">Vocea părinților</div>
+          <h2>Testimoniale care transmit încredere și apropiere</h2>
+          <p>
+            Aceste texte pot fi înlocuite ulterior cu recenzii reale de la părinți.
+            Stilul secțiunii este gândit să inspire delicatețe, seriozitate și căldură.
+          </p>
+        </div>
+
+        <div class="testimonials-grid">
+          <article class="testimonial-card">
+            <div class="quote-mark">“</div>
+            <p>Copilul meu vine cu drag în fiecare zi. Am observat mai multă încredere, mai multă ordine și o bucurie reală pentru activitățile de aici.</p>
+            <strong>— Andreea M.</strong>
+          </article>
+
+          <article class="testimonial-card">
+            <div class="quote-mark">“</div>
+            <p>Atmosfera este calmă, elegantă și foarte plăcută. Profesorii sunt atenți, iar activitățile sunt variate și bine organizate.</p>
+            <strong>— Mihai D.</strong>
+          </article>
+
+          <article class="testimonial-card">
+            <div class="quote-mark">“</div>
+            <p>Ne-a convins combinația dintre seriozitate și căldură. Este exact genul de spațiu în care îți dorești să îți lași copilul după școală.</p>
+            <strong>— Ioana T.</strong>
+          </article>
+        </div>
+
+        <div class="feedback-invite">
+          <p>Feedback-ul tău este important pentru noi.</p>
+          <button class="btn btn-secondary" id="openFeedback">Spune-ne părerea ta &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container contact-wrap">
+        <div class="contact-panel">
+          <div class="eyebrow">Înscrieri și informații</div>
+          <h2>Hai să construim împreună viitorul copilului tău.</h2>
+          <p>
+            Programează o discuție, solicită mai multe detalii despre locurile disponibile
+            sau personalizează oferta în funcție de nevoile familiei tale.
+          </p>
+          <a class="btn btn-primary" id="openInscriere2" href="#contact">Înscrie-te acum</a>
+          <div class="logo-note">
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div>
+              <h3>Adresă</h3>
+              <p>Str. Exemplu nr. 10, Sector 1, București</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">☎️</div>
+            <div>
+              <h3>Telefon</h3>
+              <p>0722 123 456</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">✉️</div>
+            <div>
+              <h3>Email</h3>
+              <p>contact@englishpalace.ro</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">🌐</div>
+            <div>
+              <h3>Website</h3>
+              <p>www.englishpalace.ro</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Feedback modal -->
+  <div class="feedback-backdrop" id="feedbackBackdrop">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <button class="feedback-close" id="closeFeedback" aria-label="Închide">&times;</button>
+
+      <div class="feedback-modal-inner" id="feedbackFormInner">
+        <div class="eyebrow">Opinia ta contează</div>
+        <h3 id="feedbackTitle">Spune-ne cum a fost</h3>
+        <p>Feedback-ul tău ne ajută să îmbunătățim experiența pentru fiecare copil și familie.</p>
+
+        <form id="feedbackFormEl" novalidate>
+          <div class="fb-field">
+            <label for="fbName">Prenume</label>
+            <input type="text" id="fbName" placeholder="ex. Andreea">
+          </div>
+
+          <div class="fb-field">
+            <label for="fbEmail">Email</label>
+            <input type="email" id="fbEmail" placeholder="adresa@email.ro">
+          </div>
+
+          <div class="fb-field">
+            <label>Evaluare generală</label>
+            <div class="fb-stars" id="fbStars">
+              <button type="button" data-val="1">&#9733;</button>
+              <button type="button" data-val="2">&#9733;</button>
+              <button type="button" data-val="3">&#9733;</button>
+              <button type="button" data-val="4">&#9733;</button>
+              <button type="button" data-val="5">&#9733;</button>
+            </div>
+          </div>
+
+          <div class="fb-field">
+            <label for="fbMessage">Mesajul tău</label>
+            <textarea id="fbMessage" rows="4" placeholder="Povestește-ne experiența ta cu English Palace After School..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px">
+            Trimite feedback
+          </button>
+        </form>
+      </div>
+
+      <div class="feedback-success" id="feedbackSuccess" hidden>
+        <div class="fb-success-icon">&#10003;</div>
+        <h3>Mulțumim!</h3>
+        <p>Feedback-ul tău a fost primit. Îl apreciem enorm și îl vom folosi pentru a ne îmbunătăți continuu.</p>
+        <button class="btn btn-secondary" id="closeFeedbackSuccess">Închide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Înscriere modal -->
+  <div class="feedback-backdrop" id="inscriereBackdrop">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="inscriereTitle">
+      <button class="feedback-close" id="closeInscriere" aria-label="Închide">&times;</button>
+
+      <div class="feedback-modal-inner" id="inscriereFormInner">
+        <div class="eyebrow">Înscrie-te acum</div>
+        <h3 id="inscriereTitle">Formular de înscriere</h3>
+        <p>Completează datele de mai jos și te vom contacta în cel mai scurt timp pentru a finaliza înscrierea.</p>
+
+        <form id="inscriereFormEl" novalidate>
+
+          <div class="fb-row">
+            <div class="fb-field">
+              <label for="inPrenume">Prenume *</label>
+              <input type="text" id="inPrenume" placeholder="ex. Maria" required>
+            </div>
+            <div class="fb-field">
+              <label for="inNume">Nume *</label>
+              <input type="text" id="inNume" placeholder="ex. Popescu" required>
+            </div>
+          </div>
+
+          <div class="fb-row">
+            <div class="fb-field">
+              <label for="inEmail">Email *</label>
+              <input type="email" id="inEmail" placeholder="adresa@email.ro" required>
+            </div>
+            <div class="fb-field">
+              <label for="inTelefon">Telefon *</label>
+              <input type="tel" id="inTelefon" placeholder="07XX XXX XXX" required>
+            </div>
+          </div>
+
+          <div class="fb-row">
+            <div class="fb-field">
+              <label for="inClasa">Clasa elevului *</label>
+              <select id="inClasa" required>
+                <option value="" disabled selected>Selectează clasa</option>
+                <option>Clasa pregătitoare</option>
+                <option>Clasa I</option>
+                <option>Clasa II</option>
+                <option>Clasa III</option>
+                <option>Clasa IV</option>
+              </select>
+            </div>
+            <div class="fb-field">
+              <label for="inPachet">Pachet de interes</label>
+              <select id="inPachet">
+                <option value="" disabled selected>Selectează pachetul</option>
+                <option>After School Basic — 450 RON/lună</option>
+                <option>After School Complet — 750 RON/lună</option>
+                <option>Ședințe individuale — 90 RON/sesiune</option>
+                <option>Nu știu încă</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fb-field">
+            <label for="inScoala">Școala unde studiază elevul *</label>
+            <input type="text" id="inScoala" placeholder="ex. Școala Gimnazială Nr. 1, București" required>
+          </div>
+
+          <div class="fb-field">
+            <label for="inMesaj">Mesaj sau întrebări <span style="font-weight:400;text-transform:none;letter-spacing:0">(opțional)</span></label>
+            <textarea id="inMesaj" rows="3" placeholder="Spune-ne dacă ai întrebări sau informații suplimentare..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px">
+            Trimite cererea de înscriere
+          </button>
+        </form>
+      </div>
+
+      <div class="feedback-success" id="inscriereSuccess" hidden>
+        <div class="fb-success-icon">&#10003;</div>
+        <h3>Cerere trimisă!</h3>
+        <p>Am primit cererea ta de înscriere. Te vom contacta în curând pentru a confirma locul și a discuta detaliile.</p>
+        <button class="btn btn-secondary" id="closeInscriereSuccess">Închide</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      English Palace After School — 2026
+  </footer>
+
+  <script>
+    (function () {
+      const backdrop = document.getElementById('feedbackBackdrop');
+      const openBtn  = document.getElementById('openFeedback');
+      const closeBtn = document.getElementById('closeFeedback');
+      const successCloseBtn = document.getElementById('closeFeedbackSuccess');
+      const formInner = document.getElementById('feedbackFormInner');
+      const form = document.getElementById('feedbackFormEl');
+      const successPanel = document.getElementById('feedbackSuccess');
+      const stars = document.querySelectorAll('#fbStars button');
+      let selectedRating = 0;
+
+      function openModal() {
+        backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        backdrop.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function resetModal() {
+        formInner.hidden = false;
+        successPanel.hidden = true;
+        form.reset();
+        selectedRating = 0;
+        stars.forEach(s => s.classList.remove('active'));
+      }
+
+      openBtn.addEventListener('click', openModal);
+
+      closeBtn.addEventListener('click', function () { closeModal(); setTimeout(resetModal, 300); });
+      successCloseBtn.addEventListener('click', function () { closeModal(); setTimeout(resetModal, 300); });
+
+      backdrop.addEventListener('click', function (e) {
+        if (e.target === backdrop) { closeModal(); setTimeout(resetModal, 300); }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && backdrop.classList.contains('open')) {
+          closeModal(); setTimeout(resetModal, 300);
+        }
+      });
+
+      /* Star rating */
+      stars.forEach(function (star, i) {
+        star.addEventListener('click', function () {
+          selectedRating = i + 1;
+          stars.forEach((s, j) => s.classList.toggle('active', j <= i));
+        });
+        star.addEventListener('mouseenter', function () {
+          stars.forEach((s, j) => { s.style.color = j <= i ? 'var(--gold)' : ''; });
+        });
+      });
+
+      document.getElementById('fbStars').addEventListener('mouseleave', function () {
+        stars.forEach((s, j) => {
+          s.style.color = '';
+          s.classList.toggle('active', j < selectedRating);
+        });
+      });
+
+      /* Submit */
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        formInner.hidden = true;
+        successPanel.hidden = false;
+      });
+    })();
+
+    /* ── Înscriere modal ── */
+    (function () {
+      const backdrop = document.getElementById('inscriereBackdrop');
+      const closeBtn = document.getElementById('closeInscriere');
+      const successCloseBtn = document.getElementById('closeInscriereSuccess');
+      const formInner = document.getElementById('inscriereFormInner');
+      const form = document.getElementById('inscriereFormEl');
+      const successPanel = document.getElementById('inscriereSuccess');
+
+      function openModal() {
+        backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        backdrop.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function resetModal() {
+        formInner.hidden = false;
+        successPanel.hidden = true;
+        form.reset();
+      }
+
+      document.querySelectorAll('#openInscriere, #openInscriere2').forEach(function (btn) {
+        btn.addEventListener('click', function (e) { e.preventDefault(); openModal(); });
+      });
+
+      closeBtn.addEventListener('click', function () { closeModal(); setTimeout(resetModal, 300); });
+      successCloseBtn.addEventListener('click', function () { closeModal(); setTimeout(resetModal, 300); });
+
+      backdrop.addEventListener('click', function (e) {
+        if (e.target === backdrop) { closeModal(); setTimeout(resetModal, 300); }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && backdrop.classList.contains('open')) {
+          closeModal(); setTimeout(resetModal, 300);
+        }
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        formInner.hidden = true;
+        successPanel.hidden = false;
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profesori — English Palace After School</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Page hero ── */
+    .professors-page-hero {
+      padding: 62px 0 48px;
+      text-align: center;
+    }
+
+    .professors-page-hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 500;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 18px;
+      max-width: 780px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .professors-page-hero p {
+      font-size: 1.1rem;
+      color: rgba(95,75,63,0.88);
+      max-width: 640px;
+      margin: 0 auto 32px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      color: var(--navy);
+      border-bottom: 1px solid rgba(30,63,119,0.25);
+      padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--gold); }
+
+    /* ── Professor cards ── */
+    .professor-cards-grid {
+      display: grid;
+      gap: 36px;
+    }
+
+    .professor-card {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(154,130,115,0.14);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .professor-card:nth-child(even) {
+      grid-template-columns: 1fr 300px;
+    }
+
+    .professor-card:nth-child(even) .professor-photo-block {
+      order: 2;
+    }
+
+    .professor-card:nth-child(even) .professor-content {
+      order: 1;
+    }
+
+    .professor-photo-block {
+      min-height: 340px;
+      background: linear-gradient(135deg, #eadfce 0%, #d1bfaa 60%, #c4ae96 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .professor-photo-block img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .professor-photo-block::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.78) 0 18%, transparent 10%),
+        radial-gradient(circle at 50% 78%, rgba(30,63,119,0.26) 0 30%, transparent 10%),
+        linear-gradient(180deg, rgba(211,165,47,0.18), rgba(180,15,23,0.06));
+    }
+
+    .professor-photo-block::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.36);
+      filter: blur(8px);
+      bottom: 28px;
+      right: 32px;
+    }
+
+    .professor-content {
+      padding: 40px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .professor-role {
+      color: var(--red);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .professor-content h2 {
+      font-size: 1.9rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+
+    .professor-content p {
+      font-size: 1.02rem;
+      color: rgba(95,75,63,0.9);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .professor-tags {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .professor-tags li {
+      background: rgba(211,165,47,0.1);
+      border: 1px solid rgba(211,165,47,0.22);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    @media (max-width: 860px) {
+      .professor-card,
+      .professor-card:nth-child(even) {
+        grid-template-columns: 1fr;
+      }
+
+      .professor-card:nth-child(even) .professor-photo-block {
+        order: 0;
+      }
+
+      .professor-card:nth-child(even) .professor-content {
+        order: 0;
+      }
+
+      .professor-photo-block {
+        min-height: 240px;
+      }
+
+      .professor-content {
+        padding: 28px 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <div class="brand-badge">
+          <img src="images/logo.PNG" alt="English Palace logo">
+        </div>
+        <div class="brand-text">
+          <strong>English Palace</strong>
+          <span>After School</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul>
+          <li><a href="index.html#acasa">Acasă</a></li>
+          <li><a href="index.html#avantaje">Avantaje</a></li>
+          <li><a href="activitati.html">Activități</a></li>
+          <li><a href="profesori.html" style="color:var(--gold)">Profesori</a></li>
+          <li><a href="index.html#tarife">Tarife</a></li>
+          <li><a href="index.html#testimoniale">Testimoniale</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <a class="btn btn-primary" href="index.html#contact">Înscrie-te acum</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Page intro -->
+    <section class="professors-page-hero">
+      <div class="container">
+        <a class="back-link" href="index.html">&#8592; Înapoi acasă</a>
+        <br><br>
+        <div class="eyebrow">Echipa noastră</div>
+        <h1>Profesori care inspiră prin răbdare, profesionalism și implicare</h1>
+        <p>
+          La English Palace After School, fiecare copil beneficiază de atenția unor cadre
+          didactice dedicate, cu experiență și pasiune pentru educație. Cunoaște-i pe cei
+          care îi însoțesc zi de zi pe copiii voștri.
+        </p>
+      </div>
+    </section>
+
+    <!-- Professor cards -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="professor-cards-grid">
+
+          <!-- Card 1: impar — foto stânga, conținut dreapta -->
+          <article class="professor-card">
+            <div class="professor-photo-block">
+              <img src="images/teacher_f.jpeg" alt="Prof1">
+            </div>
+            <div class="professor-content">
+              <div class="professor-role">Coordonator educațional</div>
+              <h2>Andreea Popescu</h2>
+              <p>
+                Andreea coordonează întreaga activitate educațională a after school-ului,
+                asigurând un program coerent, bine structurat și adaptat nevoilor fiecărui copil.
+                Cu o experiență bogată în lucrul cu elevii din ciclul primar, aduce calm, ordine
+                și o prezență caldă în viața de zi cu zi a celor mici.
+              </p>
+              <ul class="professor-tags">
+                <li>Ciclul primar</li>
+                <li>Management educațional</li>
+                <li>Sprijin individual</li>
+                <li>Comunicare cu părinții</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- Card 2: par — conținut stânga, foto dreapta -->
+          <article class="professor-card">
+            <div class="professor-photo-block">
+              <img src="images/teacher_f2.jpeg" alt="Prof1">
+            </div>
+            <div class="professor-content">
+              <div class="professor-role">Profesor pian</div>
+              <h2>Diana Ionescu</h2>
+              <p>
+                Diana transformă fiecare lecție de pian într-o experiență memorabilă. Prin
+                răbdare și entuziasm, îi introduce pe copii în lumea muzicii pas cu pas —
+                de la primele note până la piese complete. Recitalurile de final de semestru
+                sunt întotdeauna un moment de mândrie pentru elevi și părinți deopotrivă.
+              </p>
+              <ul class="professor-tags">
+                <li>Pian pentru începători</li>
+                <li>Teorie muzicală</li>
+                <li>Ritm și coordonare</li>
+                <li>Recitaluri semestriale</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- Card 3: impar — foto stânga, conținut dreapta -->
+          <article class="professor-card">
+            <div class="professor-photo-block">
+              <img src="images/teacher_m.png" alt="Prof1">
+            </div>
+            <div class="professor-content">
+              <div class="professor-role">Profesor informatică</div>
+              <h2>Marian Stan</h2>
+              <p>
+                Marian face din tehnologie un prieten al copiilor, nu o sperietoare. Prin
+                activități interactive și exerciții de logică adaptate vârstei, îi ghidează
+                pe cei mici în lumea digitală cu claritate și bună dispoziție. Introduce
+                noțiuni de programare vizuală și siguranță online accesibile și relevante.
+              </p>
+              <ul class="professor-tags">
+                <li>Programare Scratch</li>
+                <li>Logică și algoritmi</li>
+                <li>Siguranță online</li>
+                <li>Exerciții interactive</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- Card 4: par — conținut stânga, foto dreapta -->
+          <article class="professor-card">
+            <div class="professor-photo-block">
+              <img src="images/teacher_f3.jpeg" alt="Prof1">
+            </div>
+            <div class="professor-content">
+              <div class="professor-role">Profesor arte</div>
+              <h2>Raluca Marin</h2>
+              <p>
+                Raluca crede că fiecare copil este un artist în devenire. Atelierele ei
+                combină tehnici clasice de pictură cu exerciții creative libere, oferind
+                un spațiu în care imaginația nu are limite. Lucrările copiilor sunt expuse
+                lunar, celebrând fiecare progres și fiecare viziune unică.
+              </p>
+              <ul class="professor-tags">
+                <li>Pictură și acuarelă</li>
+                <li>Colaj și tehnici mixte</li>
+                <li>Expresie artistică liberă</li>
+                <li>Expoziții lunare</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- Card 5: impar — foto stânga, conținut dreapta -->
+          <article class="professor-card">
+            <div class="professor-photo-block">
+              <img src="images/teacher_m2.png" alt="Prof1">
+            </div>
+            <div class="professor-content">
+              <div class="professor-role">Coordonator activități sportive</div>
+              <h2>Alex Petrescu</h2>
+              <p>
+                Alex aduce energie, disciplină și spiritul de echipă în fiecare ședință
+                sportivă. Activitățile sale sunt gândite să fie recreative și incluzive,
+                punând accent pe mișcare, cooperare și bucuria jocului. Mini-olimpiadele
+                trimestriale sunt momentul așteptat cu nerăbdare de toți copiii.
+              </p>
+              <ul class="professor-tags">
+                <li>Jocuri de echipă</li>
+                <li>Coordonare și echilibru</li>
+                <li>Activități în aer liber</li>
+                <li>Mini-olimpiade trimestriale</li>
+              </ul>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section">
+      <div class="container" style="text-align:center">
+        <div class="eyebrow">Vino alături de noi</div>
+        <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:500;margin-bottom:16px;color:var(--text)">
+          Cunoaște echipa în persoană
+        </h2>
+        <p style="font-size:1.05rem;color:rgba(95,75,63,0.88);max-width:560px;margin:0 auto 28px">
+          Programează o vizită la English Palace After School și descoperă atmosfera caldă
+          și profesionalismul echipei noastre. Locurile sunt limitate — contactează-ne pentru detalii.
+        </p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+          <a class="btn btn-primary" href="index.html#contact">Înscrie-te acum</a>
+          <a class="btn btn-secondary" href="activitati.html">Vezi activitățile</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      English Palace After School — 2026
+    </div>
+  </footer>
+
+</body>
+</html>
